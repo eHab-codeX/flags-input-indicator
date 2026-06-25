@@ -1,0 +1,9 @@
+{
+  "uuid": "flags-input@ehab",
+  "name": "Flags Input Indicator",
+  "description": "Show country flags in the GNOME keyboard layout menu and top bar",
+  "version": 5,
+  "shell-version": ["50"]
+  "url": "https://github.com/ehab/flags-input-indicator",
+  "license": "MIT"
+}
