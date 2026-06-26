@@ -127,6 +127,7 @@ function hookKeyboardIndicator(keyboard, extension) {
 }
 
 export default class FlagsInputExtension extends Extension {
+<<<<<<< HEAD
 enable() {
     this._manager = getInputSourceManager();
     this._keyboardHooked = false;
@@ -177,4 +178,45 @@ disable() {
     this._keyboardHooked = false;
     this._manager = null;
 }
+=======
+    enable() {
+        this._manager = getInputSourceManager();
+        this._keyboardHooked = false;
+
+        this._tryHook = () => {
+            if (hookKeyboardIndicator(Main.panel.statusArea?.keyboard, this))
+                return GLib.SOURCE_REMOVE;
+            return GLib.SOURCE_CONTINUE;
+        };
+
+        if (!hookKeyboardIndicator(Main.panel.statusArea?.keyboard, this))
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, this._tryHook);
+
+        this._manager.connectObject(
+            'sources-changed', () => applyFlags(this._keyboard),
+            'current-source-changed', () => applyFlags(this._keyboard),
+            this
+        );
+    }
+
+    disable() {
+        this._manager?.disconnectObject(this);
+
+        if (this._keyboard && this._origAddSourceIndicators) {
+            this._keyboard._addSourceIndicators = this._origAddSourceIndicators;
+            for (const is of this._keyboard._inputSources ?? []) {
+                if (is._flagsInputChangedId) {
+                    is.disconnect(is._flagsInputChangedId);
+                    delete is._flagsInputChangedId;
+                }
+            }
+            this._keyboard._sourcesChanged();
+        }
+
+        this._keyboard = null;
+        this._origAddSourceIndicators = null;
+        this._keyboardHooked = false;
+        this._manager = null;
+    }
+>>>>>>> 1b4163e428023fbe04b77fa618f7938ac71bdf53
 }
